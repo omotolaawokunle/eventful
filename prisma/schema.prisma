@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CREATOR
+  EVENTEE
+}
+
+enum EventCategory {
+  CONCERT
+  THEATER
+  SPORTS
+  CULTURAL
+  CONFERENCE
+  FESTIVAL
+  WORKSHOP
+  OTHER
+}
+
+enum TicketStatus {
+  ACTIVE
+  USED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  firstName       String
+  lastName        String
+  role            Role     @default(EVENTEE)
+  phone           String?
+  avatarUrl       String?
+  emailVerified   Boolean  @default(false)
+  refreshToken    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  events          Event[]
+  tickets         Ticket[]
+  reminders       Reminder[]
+  payments        Payment[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Event {
+  id              String         @id @default(uuid())
+  title           String
+  description     String
+  date            DateTime
+  endDate         DateTime?
+  venue           String
+  city            String
+  category        EventCategory  @default(OTHER)
+  bannerUrl       String?
+  totalTickets    Int
+  availableTickets Int
+  price           Float          @default(0)
+  reminderDays    Int?
+  isPublished     Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  creatorId       String
+  creator         User           @relation(fields: [creatorId], references: [id])
+  tickets         Ticket[]
+  payments        Payment[]
+  reminders       Reminder[]
+
+  @@index([creatorId])
+  @@index([category])
+  @@index([date])
+  @@index([city])
+  @@index([isPublished])
+}
+
+model Ticket {
+  id              String       @id @default(uuid())
+  qrCodeData      String       @unique
+  qrCodeImage     String?
+  status          TicketStatus @default(ACTIVE)
+  scannedAt       DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  eventId         String
+  event           Event        @relation(fields: [eventId], references: [id])
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  paymentId       String       @unique
+  payment         Payment      @relation(fields: [paymentId], references: [id])
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([qrCodeData])
+  @@index([status])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  amount          Float
+  currency        String        @default("NGN")
+  status          PaymentStatus @default(PENDING)
+  reference       String        @unique
+  paystackRef     String?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  eventId         String
+  event           Event         @relation(fields: [eventId], references: [id])
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  ticket          Ticket?
+
+  @@index([reference])
+  @@index([paystackRef])
+  @@index([status])
+  @@index([eventId])
+  @@index([userId])
+}
+
+model Reminder {
+  id              String   @id @default(uuid())
+  remindAt        DateTime
+  isSent          Boolean  @default(false)
+  type            String   @default("CUSTOM")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  eventId         String
+  event           Event    @relation(fields: [eventId], references: [id])
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([remindAt])
+  @@index([isSent])
+  @@index([eventId])
+  @@index([userId])
+}
