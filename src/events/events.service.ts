@@ -44,14 +44,14 @@ export class EventsService {
 
     if (query.search) {
       where.OR = [
-        { title: { contains: query.search, mode: 'insensitive' } },
-        { description: { contains: query.search, mode: 'insensitive' } },
-        { venue: { contains: query.search, mode: 'insensitive' } },
-        { city: { contains: query.search, mode: 'insensitive' } },
+        { title: { contains: query.search } },
+        { description: { contains: query.search } },
+        { venue: { contains: query.search } },
+        { city: { contains: query.search } },
       ];
     }
     if (query.category) where.category = query.category;
-    if (query.city) where.city = { contains: query.city, mode: 'insensitive' };
+    if (query.city) where.city = { contains: query.city };
 
     const skip = ((query.page || 1) - 1) * (query.limit || 20);
 
