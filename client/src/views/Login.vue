@@ -34,8 +34,9 @@ async function handleLogin() {
           <p class="text-primary-500 mt-2">Sign in to continue to Eventful</p>
         </div>
         <form @submit.prevent="handleLogin" class="space-y-5">
-          <Input v-model="email" label="Email" type="email" placeholder="you@example.com" :error="error" />
+          <Input v-model="email" label="Email" type="email" placeholder="you@example.com" />
           <Input v-model="password" label="Password" type="password" placeholder="Your password" />
+          <p v-if="error" class="text-sm text-red-500">{{ error }}</p>
           <Button type="submit" variant="primary" size="lg" class="w-full" :loading="loading">Sign In</Button>
         </form>
         <p class="text-center text-sm text-primary-500 mt-6">

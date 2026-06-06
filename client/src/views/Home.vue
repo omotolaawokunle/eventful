@@ -80,7 +80,7 @@ onMounted(async () => {
           <p class="text-primary-500 mt-2">Discover trending experiences near you</p>
         </div>
         <router-link to="/events" class="hidden sm:flex items-center gap-1 text-primary-600 font-semibold hover:text-primary-700 transition-colors">
-          View All <ArrowRight class="w-4 h-4" />
+          View All Events <ArrowRight class="w-4 h-4" />
         </router-link>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

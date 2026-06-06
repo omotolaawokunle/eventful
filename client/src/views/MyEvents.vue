@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Plus, BarChart3, Users, Eye, EyeOff } from 'lucide-vue-next';
+import { Plus, BarChart3, Users, Eye } from 'lucide-vue-next';
 import api from '@/lib/api';
 import Button from '@/components/ui/Button.vue';
 import Badge from '@/components/ui/Badge.vue';

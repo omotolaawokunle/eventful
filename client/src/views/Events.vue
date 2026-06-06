@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { Search, SlidersHorizontal } from 'lucide-vue-next';
+import { ref, computed, onMounted, watch } from 'vue';
+import { Search } from 'lucide-vue-next';
 import api from '@/lib/api';
 import EventCard from '@/components/events/EventCard.vue';
 import Button from '@/components/ui/Button.vue';
@@ -35,7 +35,7 @@ watch([search, category, city, page], fetchEvents);
 const categories = ['CONCERT', 'THEATER', 'SPORTS', 'CULTURAL', 'CONFERENCE', 'FESTIVAL', 'WORKSHOP', 'OTHER'];
 const totalPages = computed(() => Math.ceil(total.value / limit));
 
-import { computed } from 'vue';
+
 </script>
 
 <template>
@@ -48,13 +48,13 @@ import { computed } from 'vue';
     <div class="flex flex-col md:flex-row gap-4 mb-8">
       <div class="relative flex-1">
         <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
-        <input v-model="search" placeholder="Search events..." class="w-full pl-10 pr-4 py-3 bg-white border-2 border-primary-200 rounded-xl focus:border-primary-500 outline-none transition-colors" />
+        <input v-model="search" placeholder="Search events..." class="w-full pl-10 pr-4 py-3 bg-white border-2 border-primary-200 rounded-lg focus:border-primary-500 outline-none transition-colors" />
       </div>
-      <select v-model="category" class="px-4 py-3 bg-white border-2 border-primary-200 rounded-xl focus:border-primary-500 outline-none text-primary-700">
+      <select v-model="category" class="px-4 py-3 bg-white border-2 border-primary-200 rounded-lg focus:border-primary-500 outline-none text-primary-700">
         <option value="">All Categories</option>
         <option v-for="cat in categories" :key="cat" :value="cat">{{ cat.charAt(0) + cat.slice(1).toLowerCase() }}</option>
       </select>
-      <input v-model="city" placeholder="City..." class="px-4 py-3 bg-white border-2 border-primary-200 rounded-xl focus:border-primary-500 outline-none w-full md:w-48" />
+      <input v-model="city" placeholder="City..." class="px-4 py-3 bg-white border-2 border-primary-200 rounded-lg focus:border-primary-500 outline-none w-full md:w-48" />
     </div>
 
     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

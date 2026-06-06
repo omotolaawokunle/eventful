@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { MapPin, Calendar, Clock, Users, Share2, ArrowLeft } from 'lucide-vue-next';
+import { MapPin, Calendar, Clock, Users, ArrowLeft } from 'lucide-vue-next';
 import { useAuthStore } from '@/stores/auth';
 import api from '@/lib/api';
 import Button from '@/components/ui/Button.vue';
