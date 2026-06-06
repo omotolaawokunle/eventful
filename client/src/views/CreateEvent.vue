@@ -11,14 +11,19 @@ const form = ref({
   totalTickets: 100, price: 0, category: 'OTHER', reminderDays: 0,
 });
 const loading = ref(false);
+const error = ref('');
 
 async function handleSubmit() {
+  error.value = '';
   loading.value = true;
   try {
     const payload = { ...form.value, totalTickets: Number(form.value.totalTickets), price: Number(form.value.price), reminderDays: form.value.reminderDays ? Number(form.value.reminderDays) : undefined };
     await api.post('/events', payload);
     router.push('/creator/events');
-  } catch {}
+  } catch (err: any) {
+    const msg = err?.message;
+    error.value = Array.isArray(msg) ? msg.join(', ') : (msg || 'Failed to create event');
+  }
   loading.value = false;
 }
 </script>
@@ -52,6 +57,7 @@ async function handleSubmit() {
         <Input v-model.number="form.price" label="Price (₦)" type="number" />
         <Input v-model.number="form.reminderDays" label="Reminder (days before)" type="number" />
       </div>
+      <p v-if="error" class="text-sm text-red-500">{{ error }}</p>
       <div class="flex gap-4 pt-4">
         <Button type="submit" variant="primary" size="lg" :loading="loading">Create Event</Button>
         <Button type="button" variant="outline" size="lg" @click="router.back()">Cancel</Button>

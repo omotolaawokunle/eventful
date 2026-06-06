@@ -21,7 +21,7 @@ onMounted(async () => {
     <section class="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 text-white">
       <div class="absolute inset-0 opacity-10">
         <div class="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-        <div class="absolute bottom-10 right-10 w-96 h-96 bg-cta-400 rounded-full blur-3xl" />
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-primary-300 rounded-full blur-3xl" />
       </div>
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
         <div class="max-w-3xl">

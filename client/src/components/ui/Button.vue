@@ -16,7 +16,7 @@ defineProps<{
       variant === 'secondary' ? 'bg-primary-100 text-primary-700 hover:bg-primary-200' :
       variant === 'outline' ? 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50' :
       variant === 'ghost' ? 'text-primary-600 hover:bg-primary-100' :
-      variant === 'cta' ? 'bg-cta-600 text-white hover:bg-cta-700 shadow-lg shadow-cta-600/25' :
+      variant === 'cta' ? 'bg-primary-700 text-white hover:bg-primary-800 shadow-lg shadow-primary-700/25' :
       'bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/25',
     ]"
   >

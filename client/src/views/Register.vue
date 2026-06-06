@@ -18,7 +18,8 @@ async function handleRegister() {
     await auth.register(form.value);
     router.push(auth.isCreator ? '/creator/dashboard' : '/tickets');
   } catch (err: any) {
-    error.value = err?.message || 'Registration failed';
+    const msg = err?.message;
+    error.value = Array.isArray(msg) ? msg.join(', ') : (msg || 'Registration failed');
   }
   loading.value = false;
 }

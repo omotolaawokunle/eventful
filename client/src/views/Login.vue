@@ -19,7 +19,8 @@ async function handleLogin() {
     await auth.login(email.value, password.value);
     router.push(auth.isCreator ? '/creator/dashboard' : '/tickets');
   } catch (err: any) {
-    error.value = err?.message || 'Invalid credentials';
+    const msg = err?.message;
+    error.value = Array.isArray(msg) ? msg.join(', ') : (msg || 'Invalid credentials');
   }
   loading.value = false;
 }
