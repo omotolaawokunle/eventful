@@ -44,7 +44,9 @@ async function bootstrap() {
     if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
       return next();
     }
-    res.sendFile(join(__dirname, '..', 'dist', 'client', 'index.html'));
+    res.sendFile(join(__dirname, '..', 'dist', 'client', 'index.html'), (err: any) => {
+      if (err) next();
+    });
   });
 
   const port = process.env.PORT || 3000;
