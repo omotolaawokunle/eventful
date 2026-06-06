@@ -40,7 +40,7 @@ export class PaymentsService {
         status: 'PENDING',
         eventId: event.id,
         userId,
-        metadata: { quantity: dto.quantity, unitPrice: event.price },
+        metadata: JSON.stringify({ quantity: dto.quantity, unitPrice: event.price }),
       },
     });
 
