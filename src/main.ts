@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -10,9 +10,8 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useStaticAssets(join(__dirname, '..', 'dist', 'client'), {
-    index: false,
-  });
+  const clientDir = resolve(process.cwd(), 'dist', 'client');
+  app.useStaticAssets(clientDir, { index: false });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -44,7 +43,7 @@ async function bootstrap() {
     if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
       return next();
     }
-    res.sendFile(join(__dirname, '..', 'dist', 'client', 'index.html'), (err: any) => {
+    res.sendFile(join(clientDir, 'index.html'), (err: any) => {
       if (err) next();
     });
   });
