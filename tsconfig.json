@@ -4,7 +4,6 @@
     "target": "ES2021",
     "outDir": "./dist",
     "rootDir": ".",
-    "baseUrl": "./",
     "sourceMap": true,
     "declaration": true,
     "removeComments": true,
@@ -17,10 +16,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*.ts", "prisma/seed.ts"],
   "exclude": ["node_modules", "dist", "client"]
