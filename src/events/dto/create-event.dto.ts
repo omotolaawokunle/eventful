@@ -13,23 +13,23 @@ export enum EventCategory {
 
 export class CreateEventDto {
   @IsString()
-  title: string;
+  title!: string;
 
   @IsString()
-  description: string;
+  description!: string;
 
   @IsDateString()
-  date: string;
+  date!: string;
 
   @IsDateString()
   @IsOptional()
   endDate?: string;
 
   @IsString()
-  venue: string;
+  venue!: string;
 
   @IsString()
-  city: string;
+  city!: string;
 
   @IsEnum(EventCategory)
   @IsOptional()
@@ -37,11 +37,11 @@ export class CreateEventDto {
 
   @IsNumber()
   @Min(1)
-  totalTickets: number;
+  totalTickets!: number;
 
   @IsNumber()
   @Min(0)
-  price: number;
+  price!: number;
 
   @IsNumber()
   @IsOptional()

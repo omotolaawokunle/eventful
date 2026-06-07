@@ -2,7 +2,7 @@ import { IsUUID, IsDateString, IsOptional, IsInt, Min } from 'class-validator';
 
 export class CreateReminderDto {
   @IsUUID()
-  eventId: string;
+  eventId!: string;
 
   @IsDateString()
   @IsOptional()
