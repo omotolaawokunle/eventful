@@ -1,8 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { AppError } from '../middleware/error.middleware';
 
-@Injectable()
 export class TicketsService {
   constructor(
     private prisma: PrismaService,
@@ -37,10 +36,10 @@ export class TicketsService {
       },
     });
 
-    if (!ticket) throw new NotFoundException('Invalid QR code - ticket not found');
-    if (ticket.status === 'USED') throw new BadRequestException('Ticket has already been used');
-    if (ticket.status === 'CANCELLED') throw new BadRequestException('Ticket has been cancelled');
-    if (ticket.status === 'REFUNDED') throw new BadRequestException('Ticket has been refunded');
+    if (!ticket) throw new AppError(404, 'Invalid QR code - ticket not found');
+    if (ticket.status === 'USED') throw new AppError(400, 'Ticket has already been used');
+    if (ticket.status === 'CANCELLED') throw new AppError(400, 'Ticket has been cancelled');
+    if (ticket.status === 'REFUNDED') throw new AppError(400, 'Ticket has been refunded');
 
     return ticket;
   }
@@ -51,9 +50,9 @@ export class TicketsService {
       include: { event: true },
     });
 
-    if (!ticket) throw new NotFoundException('Invalid QR code - ticket not found');
-    if (ticket.status === 'USED') throw new BadRequestException('Ticket has already been used');
-    if (ticket.status === 'CANCELLED') throw new BadRequestException('Ticket has been cancelled');
+    if (!ticket) throw new AppError(404, 'Invalid QR code - ticket not found');
+    if (ticket.status === 'USED') throw new AppError(400, 'Ticket has already been used');
+    if (ticket.status === 'CANCELLED') throw new AppError(400, 'Ticket has been cancelled');
 
     const updated = await this.prisma.ticket.update({
       where: { id: ticket.id },
@@ -66,8 +65,8 @@ export class TicketsService {
 
   async getEventAttendees(eventId: string, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id: eventId } });
-    if (!event) throw new NotFoundException('Event not found');
-    if (event.creatorId !== userId) throw new BadRequestException('Not your event');
+    if (!event) throw new AppError(404, 'Event not found');
+    if (event.creatorId !== userId) throw new AppError(400, 'Not your event');
 
     const cacheKey = `tickets:event:${eventId}:attendees`;
     const cached = await this.redis.get(cacheKey);

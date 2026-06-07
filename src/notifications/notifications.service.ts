@@ -1,12 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../database/prisma.service';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import * as nodemailer from 'nodemailer';
 
-@Injectable()
 export class NotificationsService {
-  private readonly logger = new Logger(NotificationsService.name);
   private transporter: nodemailer.Transporter;
 
   constructor(private prisma: PrismaService) {
@@ -57,7 +53,6 @@ export class NotificationsService {
     return this.prisma.reminder.deleteMany({ where: { id, userId } });
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
   async processReminders() {
     const now = new Date();
 
@@ -86,9 +81,9 @@ export class NotificationsService {
           data: { isSent: true },
         });
 
-        this.logger.log(`Reminder sent to ${reminder.user.email} for ${reminder.event.title}`);
+        console.log(`Reminder sent to ${reminder.user.email} for ${reminder.event.title}`);
       } catch (error) {
-        this.logger.error(`Failed to send reminder to ${reminder.user.email}`, error);
+        console.error(`Failed to send reminder to ${reminder.user.email}`, error);
       }
     }
   }
@@ -114,7 +109,7 @@ export class NotificationsService {
         `,
       });
     } catch {
-      this.logger.warn('Email transport not configured, skipping reminder email');
+      console.warn('Email transport not configured, skipping reminder email');
     }
   }
 }

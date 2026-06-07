@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import * as QRCode from 'qrcode';
 import { v4 as uuidv4 } from 'uuid';
 
-@Injectable()
 export class QrcodeService {
   async generateQRCodeData(eventId: string, userId: string): Promise<string> {
     const seed = uuidv4();

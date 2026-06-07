@@ -1,11 +1,10 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { QueryEventDto } from './dto/query-event.dto';
+import { AppError } from '../middleware/error.middleware';
 
-@Injectable()
 export class EventsService {
   constructor(
     private prisma: PrismaService,
@@ -53,13 +52,15 @@ export class EventsService {
     if (query.category) where.category = query.category;
     if (query.city) where.city = { contains: query.city };
 
-    const skip = ((query.page || 1) - 1) * (query.limit || 20);
+    const pageNum = parseInt(String(query.page || '1'), 10);
+    const limitNum = parseInt(String(query.limit || '20'), 10);
+    const skip = (pageNum - 1) * limitNum;
 
     const [events, total] = await Promise.all([
       this.prisma.event.findMany({
         where,
         skip,
-        take: query.limit || 20,
+        take: limitNum,
         orderBy: { date: 'asc' },
         include: {
           creator: { select: { id: true, firstName: true, lastName: true } },
@@ -102,15 +103,15 @@ export class EventsService {
       },
     });
 
-    if (!event) throw new NotFoundException('Event not found');
+    if (!event) throw new AppError(404, 'Event not found');
     await this.redis.set(cacheKey, event, 300);
     return event;
   }
 
   async update(id: string, dto: UpdateEventDto, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id } });
-    if (!event) throw new NotFoundException('Event not found');
-    if (event.creatorId !== userId) throw new ForbiddenException('Not your event');
+    if (!event) throw new AppError(404, 'Event not found');
+    if (event.creatorId !== userId) throw new AppError(403, 'Not your event');
 
     const updated = await this.prisma.event.update({
       where: { id },
@@ -128,8 +129,8 @@ export class EventsService {
 
   async publish(id: string, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id } });
-    if (!event) throw new NotFoundException('Event not found');
-    if (event.creatorId !== userId) throw new ForbiddenException('Not your event');
+    if (!event) throw new AppError(404, 'Event not found');
+    if (event.creatorId !== userId) throw new AppError(403, 'Not your event');
 
     const updated = await this.prisma.event.update({
       where: { id },

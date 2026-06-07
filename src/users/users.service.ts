@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AppError } from '../middleware/error.middleware';
 
-@Injectable()
 export class UsersService {
   constructor(
     private prisma: PrismaService,
@@ -29,7 +28,7 @@ export class UsersService {
       },
     });
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new AppError(404, 'User not found');
     await this.redis.set(cacheKey, user, 600);
     return user;
   }

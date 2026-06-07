@@ -1,22 +1,20 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { AppError } from '../middleware/error.middleware';
 
-@Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private jwtService: JwtService,
     private redis: RedisService,
   ) {}
 
   async register(dto: RegisterDto) {
     const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (existing) throw new ConflictException('Email already registered');
+    if (existing) throw new AppError(409, 'Email already registered');
 
     const hashedPassword = await bcrypt.hash(dto.password, 12);
 
@@ -38,10 +36,10 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) throw new AppError(401, 'Invalid credentials');
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
-    if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
+    if (!isPasswordValid) throw new AppError(401, 'Invalid credentials');
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 
@@ -73,8 +71,7 @@ export class AuthService {
 
   private async generateTokens(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET || 'default-secret',
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET || 'default-secret', {
       expiresIn: process.env.JWT_EXPIRATION || '7d',
     });
 

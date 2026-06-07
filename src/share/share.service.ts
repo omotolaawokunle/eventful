@@ -1,6 +1,3 @@
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
 export class ShareService {
   generateShareLinks(eventId: string, title: string, description: string, url?: string) {
     const eventUrl = url || `${process.env.APP_URL}/events/${eventId}`;

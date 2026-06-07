@@ -1,11 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import axios from 'axios';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { QrcodeService } from '../qrcode/qrcode.service';
 import { InitializePaymentDto } from './dto/initialize-payment.dto';
+import { AppError } from '../middleware/error.middleware';
 
-@Injectable()
 export class PaymentsService {
   private readonly paystackBaseUrl = 'https://api.paystack.co';
 
@@ -24,10 +23,10 @@ export class PaymentsService {
 
   async initializePayment(dto: InitializePaymentDto, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id: dto.eventId } });
-    if (!event) throw new NotFoundException('Event not found');
-    if (!event.isPublished) throw new BadRequestException('Event is not published');
+    if (!event) throw new AppError(404, 'Event not found');
+    if (!event.isPublished) throw new AppError(400, 'Event is not published');
     if (event.availableTickets < dto.quantity) {
-      throw new BadRequestException('Not enough tickets available');
+      throw new AppError(400, 'Not enough tickets available');
     }
 
     const totalAmount = Math.round(event.price * dto.quantity * 100);
@@ -72,13 +71,13 @@ export class PaymentsService {
         where: { id: payment.id },
         data: { status: 'FAILED' },
       });
-      throw new BadRequestException('Payment initialization failed');
+      throw new AppError(400, 'Payment initialization failed');
     }
   }
 
   async verifyPayment(reference: string) {
     const payment = await this.prisma.payment.findUnique({ where: { reference } });
-    if (!payment) throw new NotFoundException('Payment not found');
+    if (!payment) throw new AppError(404, 'Payment not found');
 
     try {
       const response = await axios.get(`${this.paystackBaseUrl}/transaction/verify/${reference}`, {
@@ -94,7 +93,7 @@ export class PaymentsService {
         await this.prisma.$transaction(async (tx) => {
           const event = await tx.event.findUnique({ where: { id: payment.eventId } });
           if (!event || event.availableTickets < quantity) {
-            throw new BadRequestException('Not enough tickets');
+            throw new AppError(400, 'Not enough tickets');
           }
 
           await tx.event.update({
@@ -143,8 +142,8 @@ export class PaymentsService {
 
       return { status: 'failed', message: 'Payment was not successful' };
     } catch (error: any) {
-      if (error instanceof BadRequestException) throw error;
-      throw new BadRequestException('Payment verification failed');
+      if (error instanceof AppError) throw error;
+      throw new AppError(400, 'Payment verification failed');
     }
   }
 
@@ -159,8 +158,8 @@ export class PaymentsService {
 
   async getPaymentHistory(eventId: string, userId: string) {
     const event = await this.prisma.event.findUnique({ where: { id: eventId } });
-    if (!event) throw new NotFoundException('Event not found');
-    if (event.creatorId !== userId) throw new BadRequestException('Not your event');
+    if (!event) throw new AppError(404, 'Event not found');
+    if (event.creatorId !== userId) throw new AppError(400, 'Not your event');
 
     const cacheKey = `payments:event:${eventId}`;
     const cached = await this.redis.get(cacheKey);

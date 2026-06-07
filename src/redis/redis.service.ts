@@ -1,10 +1,7 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 
-@Injectable()
-export class RedisService implements OnModuleDestroy {
+export class RedisService {
   private readonly redis: Redis;
-  private readonly logger = new Logger(RedisService.name);
   private readonly defaultTtl = 300;
 
   constructor() {
@@ -18,9 +15,9 @@ export class RedisService implements OnModuleDestroy {
   async onModuleInit() {
     try {
       await this.redis.connect();
-      this.logger.log('Connected to Redis');
+      console.log('Connected to Redis');
     } catch {
-      this.logger.warn('Redis connection failed, caching disabled');
+      console.warn('Redis connection failed, caching disabled');
     }
   }
 
