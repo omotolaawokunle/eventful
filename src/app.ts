@@ -835,9 +835,8 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 3000;
-  const host = process.env.HOST || 'localhost'; // Use '127.0.0.1' or 'localhost' for local-only
   app.listen(Number(port), () => {
-    console.log(`Eventful API running on http://${host}:${port}`);
+    console.log(`Eventful API running on http://localhost:${port}`);
     if (process.env.SWAGGER_ENABLED !== 'false') {
       console.log(`Swagger docs at http://localhost:${port}/api/docs`);
     }
